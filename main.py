@@ -1,6 +1,8 @@
 import sys
-from PyQt4 import QtGui, uic
-from PyQt4.Qt import *
+from PyQt4 import QtGui
+from PyQt4 import QtCore
+from PyQt4 import uic
+
 
 
 class GoViewUI(QtGui.QMainWindow):
@@ -8,7 +10,7 @@ class GoViewUI(QtGui.QMainWindow):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
         self.ui = uic.loadUi('GoView.ui', self)
-        self.ui.menuLayout.setAlignment(Qt.AlignTop)
+        self.ui.menuLayout.setAlignment( QtCore.Qt.AlignTop)
 
 
 
