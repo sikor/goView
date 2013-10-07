@@ -66,6 +66,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="coordsLabel">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>

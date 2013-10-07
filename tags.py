@@ -1,0 +1,5 @@
+class_name = 'class'
+x_pos = 'x'
+y_pos = 'y'
+label = 'label'
+color = 'color'
