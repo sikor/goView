@@ -51,6 +51,7 @@ class GoViewUI(QtGui.QMainWindow):
 
         self.scene = Scene(self.ui.coordsLabel)
         self.ui.graphicsView.setScene(self.scene)
+        self.ui.graphicsView.scale(1, -1)
         self.ui.graphicsView.setRenderHint(QtGui.QPainter.Antialiasing)
 
     def on_generate(self):
