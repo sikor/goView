@@ -10,6 +10,8 @@ import point
 import utils
 import encoder
 import decoder
+import pointsToJSON
+import segmentsToJSON
 
 
 class Scene(QtGui.QGraphicsScene):
@@ -30,6 +32,7 @@ class Scene(QtGui.QGraphicsScene):
 
     def refresh(self):
         for item in self.items():
+            item.scene = None
             self.removeItem(item)
         for entity in self._entities:
             entity.add_to_scene(self)
@@ -48,6 +51,8 @@ class GoViewUI(QtGui.QMainWindow):
         self.ui.generateButton.clicked.connect(lambda: self.on_generate())
         self.ui.loadButton.clicked.connect(lambda: self.on_load())
         self.ui.saveButton.clicked.connect(lambda: self.on_save())
+        self.ui.loadPointsButton.clicked.connect(lambda: self.on_load_points())
+        self.ui.loadSegmentsButton.clicked.connect(lambda: self.on_load_segments())
 
         self.scene = Scene(self.ui.coordsLabel)
         self.ui.graphicsView.setScene(self.scene)
@@ -71,13 +76,14 @@ class GoViewUI(QtGui.QMainWindow):
         self.refresh()
 
     def on_clear(self):
+        print(json.dumps(self.entities, sort_keys=True, indent=4, separators=(',', ': '), default=encoder.default))
         self.entities = []
         self.refresh()
 
 
     def refresh(self):
+        self.scene.entities = []
         self.scene.entities = self.entities
-
 
     def on_save(self):
         file_name = QtGui.QFileDialog.getSaveFileName(None, "Choose file to save scene", "./data", "*.dat")
@@ -93,7 +99,27 @@ class GoViewUI(QtGui.QMainWindow):
             return
         file = open(file_name)
         try:
-            self.entities = json.loads(file.read(), object_hook=decoder.as_entity)
+            self.entities += json.loads(file.read(), object_hook=decoder.as_entity)
+            self.refresh()
+        except Exception as e:
+            print(e)
+
+    def on_load_points(self):
+        file_name = QtGui.QFileDialog.getOpenFileName(None, "Choose file to open scene", "./data", "*.dat")
+        if file_name == '':
+            return
+        try:
+            self.entities += pointsToJSON.load(file_name)
+            self.refresh()
+        except Exception as e:
+            print(e)
+
+    def on_load_segments(self):
+        file_name = QtGui.QFileDialog.getOpenFileName(None, "Choose file to open scene", "./data", "*.dat")
+        if file_name == '':
+            return
+        try:
+            self.entities += segmentsToJSON.load(file_name)
             self.refresh()
         except Exception as e:
             print(e)

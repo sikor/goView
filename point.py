@@ -53,7 +53,7 @@ class Point(Entity):
 
     #isinstace lets IDE infer type
     def add_to_scene(self, scene):
-        if self.ellipse:
+        if self.ellipse and self.ellipse.scene:
             return
         if isinstance(scene, QtGui.QGraphicsScene):
             self.ellipse = Ellipse(self, scene,
@@ -63,6 +63,7 @@ class Point(Entity):
 
             scene.addItem(self.ellipse)
             self.label_impl = scene.addSimpleText(self.label)
+            self.label_impl.setTransform(QtGui.QTransform(1, 0, 0, 0, -1, 0, 0, 0, 1))
             if isinstance(self.label_impl, QtGui.QGraphicsSimpleTextItem):
                 self.label_impl.setPos(self.x + 5 * Point.radius, self.y)
 
