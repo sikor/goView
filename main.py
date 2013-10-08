@@ -4,8 +4,10 @@ import json
 from PyQt4 import QtGui
 from PyQt4 import uic
 
-import utils
+import polygon
+import segment
 import point
+import utils
 import encoder
 import decoder
 
@@ -27,7 +29,8 @@ class Scene(QtGui.QGraphicsScene):
         self.refresh()
 
     def refresh(self):
-        self.clear()
+        for item in self.items():
+            self.removeItem(item)
         for entity in self._entities:
             entity.add_to_scene(self)
 
@@ -51,10 +54,19 @@ class GoViewUI(QtGui.QMainWindow):
         self.ui.graphicsView.setRenderHint(QtGui.QPainter.Antialiasing)
 
     def on_generate(self):
-        self.entities = [point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)) for unused in
-                         range(10)]
-        utils.random_element(self.entities).label = 'test_label'
-        utils.random_element(self.entities).color = QtGui.QColor(255, 255, 0)
+        self.entities = [point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
+                         for unused in range(10)]
+        self.entities += [segment.Segment(point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                                          point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)))
+                          for unused in range(3)]
+        self.entities.append(polygon.Polygon([
+            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
+        ]))
+
         self.refresh()
 
     def on_clear(self):

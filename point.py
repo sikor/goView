@@ -8,12 +8,13 @@ class Point(Entity):
     lightness_threshold = QtGui.QColor(127, 127, 127).lightness()
     radius = 3
 
-    def __init__(self, x, y):
-        super().__init__()
+    def __init__(self, x, y, parents=[]):
+        super().__init__(parents)
         self._x = x
         self._y = y
         self._color = Point.default_color
-        self._label_impl = None
+        self.label_impl = None
+        self.ellipse = None
 
     @property
     def y(self):
@@ -22,6 +23,10 @@ class Point(Entity):
     @y.setter
     def y(self, y):
         self._y = y
+        for parent in self.parents:
+            parent.notify()
+        if self.ellipse:
+            self.ellipse.do_set_pos()
 
     @property
     def x(self):
@@ -30,6 +35,11 @@ class Point(Entity):
     @x.setter
     def x(self, x):
         self._x = x
+        if self.ellipse:
+            self.ellipse.do_set_pos()
+        for parent in self.parents:
+            parent.notify()
+
 
     @property
     def color(self):
@@ -38,26 +48,29 @@ class Point(Entity):
     @color.setter
     def color(self, color):
         self._color = color
+        if self.ellipse:
+            self.ellipse.do_set_color()
 
     #isinstace lets IDE infer type
     def add_to_scene(self, scene):
+        if self.ellipse:
+            return
         if isinstance(scene, QtGui.QGraphicsScene):
-            ellipse = Ellipse(self, scene,
-                              QtCore.QRectF(self.x - Point.radius, self.y - Point.radius, 2 * Point.radius,
+            self.ellipse = Ellipse(self, scene,
+                                   QtCore.QRectF(self.x - Point.radius, self.y - Point.radius, 2 * Point.radius,
                                             2 * Point.radius))
-            ellipse.do_set_color()
+            self.ellipse.do_set_color()
 
-            scene.addItem(ellipse)
-            self._label_impl = scene.addSimpleText(self.label)
-            if isinstance(self._label_impl, QtGui.QGraphicsSimpleTextItem):
-                self._label_impl.setPos(self.x + 5 * Point.radius, self.y)
+            scene.addItem(self.ellipse)
+            self.label_impl = scene.addSimpleText(self.label)
+            if isinstance(self.label_impl, QtGui.QGraphicsSimpleTextItem):
+                self.label_impl.setPos(self.x + 5 * Point.radius, self.y)
 
 
 class Ellipse(QtGui.QGraphicsEllipseItem):
     def __init__(self, this, scene, rect_f):
         super().__init__(rect_f)
         self.setAcceptHoverEvents(True)
-        self.setAcceptTouchEvents(True)
         self.menu = QtGui.QMenu()
         set_color = QtGui.QAction('Set color', scene)
         set_color.triggered.connect(self.set_color)
@@ -73,7 +86,7 @@ class Ellipse(QtGui.QGraphicsEllipseItem):
         value = QtGui.QInputDialog.getText(None, 'Enter new label', '', text=self.this.label, flags=QtCore.Qt.Tool)
         if len(value) == 2 and value[1]:
             self.this.label = value[0]
-            self.this._label_impl.setText(self.this.label)
+            self.this.label_impl.setText(self.this.label)
 
     def set_color(self):
         color = QtGui.QColorDialog.getColor(self.this.color)
@@ -106,11 +119,14 @@ class Ellipse(QtGui.QGraphicsEllipseItem):
             pos = event.scenePos()
             self.this.x = pos.x()
             self.this.y = pos.y()
-            self.setRect(QtCore.QRectF(
-                self.this.x - Point.radius, self.this.y - Point.radius,
-                2 * Point.radius, 2 * Point.radius))
-            self.this._label_impl.setPos(self.this.x + 5 * Point.radius, self.this.y)
+            self.do_set_pos()
             self.scene.show_coords(self.this.x, self.this.y)
+
+    def do_set_pos(self):
+        self.setRect(QtCore.QRectF(
+            self.this.x - Point.radius, self.this.y - Point.radius,
+            2 * Point.radius, 2 * Point.radius))
+        self.this.label_impl.setPos(self.this.x + 5 * Point.radius, self.this.y)
 
     def mousePressEvent(self, event):
         self.dragged = True
