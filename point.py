@@ -5,6 +5,7 @@ from entity import Entity
 
 class Point(Entity):
     default_color = QtGui.QColor(0, 100, 200)
+    lightness_threshold = QtGui.QColor(127, 127, 127).lightness()
     radius = 3
 
     def __init__(self, x, y):
@@ -44,8 +45,8 @@ class Point(Entity):
             ellipse = Ellipse(self, scene,
                               QtCore.QRectF(self.x - Point.radius, self.y - Point.radius, 2 * Point.radius,
                                             2 * Point.radius))
-            ellipse.setPen(self.color)
-            ellipse.setBrush(self.color.lighter())
+            ellipse.do_set_color()
+
             scene.addItem(ellipse)
             self._label_impl = scene.addSimpleText(self.label)
             if isinstance(self._label_impl, QtGui.QGraphicsSimpleTextItem):
@@ -78,8 +79,16 @@ class Ellipse(QtGui.QGraphicsEllipseItem):
         color = QtGui.QColorDialog.getColor(self.this.color)
         if color.isValid():
             self.this.color = color
-            self.setPen(color)
-            self.setBrush(color.lighter())
+            self.do_set_color()
+
+
+    def do_set_color(self):
+        if self.this.color.lightness() < Point.lightness_threshold:
+            self.setPen(self.this.color)
+            self.setBrush(self.this.color.lighter())
+        else:
+            self.setPen(self.this.color.darker())
+            self.setBrush(self.this.color)
 
     def contextMenuEvent(self, event):
         if isinstance(event, QtGui.QGraphicsSceneContextMenuEvent):
