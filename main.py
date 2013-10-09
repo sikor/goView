@@ -14,6 +14,16 @@ import pointsToJSON
 import segmentsToJSON
 
 
+class GenerationDialog(QtGui.QDialog):
+    def __init__(self, mainWindow):
+        QtGui.QDialog.__init__(self)
+        self.ui = uic.loadUi('GenerationForm.ui', self)
+        self.mainWindow = mainWindow
+        self.ui.buttonBox.accepted.connect(lambda: self.mainWindow.generateEntities(self.ui.numberOfPointsSpinBox.value(),
+                                                                                self.ui.numberOfSegmentsSpinBox.value(),
+                                                                                self.ui.numberOfPolygonsSpinBox.value()) )
+        pass
+
 class Scene(QtGui.QGraphicsScene):
     def __init__(self, coords_label):
         super().__init__()
@@ -59,21 +69,29 @@ class GoViewUI(QtGui.QMainWindow):
         self.ui.graphicsView.scale(1, -1)
         self.ui.graphicsView.setRenderHint(QtGui.QPainter.Antialiasing)
 
-    def on_generate(self):
-        self.entities = [point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
-                         for unused in range(10)]
+        self.generationForm = GenerationDialog(self)
+
+    def generateEntities(self, pointN, segmentN, polygonN):
+        self.entities += [point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
+                         for unused in range(pointN)]
         self.entities += [segment.Segment(point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
                                           point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)))
-                          for unused in range(3)]
-        self.entities.append(polygon.Polygon([
-            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
-            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
-            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
-            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
-            point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
-        ]))
+                          for unused in range(segmentN)]
+
+        for i in range(0, polygonN):
+            self.entities.append(polygon.Polygon([
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
+            ]))
 
         self.refresh()
+
+
+    def on_generate(self):
+        self.generationForm.show()
 
     def on_clear(self):
         print(json.dumps(self.entities, sort_keys=True, indent=4, separators=(',', ': '), default=encoder.default))

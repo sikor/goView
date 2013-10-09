@@ -3,6 +3,7 @@ import entity
 
 
 class Polygon(entity.Entity, entity.Parent):
+
     def __init__(self, points, opened=False):
         super().__init__()
         self.points = points
