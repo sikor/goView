@@ -21,6 +21,10 @@ class GenerationDialog(QtGui.QDialog):
         QtGui.QDialog.__init__(self)
         self.ui = uic.loadUi('GenerationForm.ui', self)
         self.mainWindow = mainWindow
+        self.ui.shapeCombo.addItem("Rectangle axis and diagonals")
+        self.ui.shapeCombo.addItem("Cirle")
+        self.ui.shapeCombo.addItem("Quadrangle")
+        self.ui.shapeCombo.addItem("Points Range")
         self.ui.buttonBox.accepted.connect(lambda: self.mainWindow.generateEntities(self.ui.numberOfPointsSpinBox.value(),
                                                                                 self.ui.numberOfSegmentsSpinBox.value(),
                                                                                 self.ui.numberOfPolygonsSpinBox.value()) )
@@ -114,7 +118,7 @@ class GoViewUI(QtGui.QMainWindow):
         newScale = 15.0/(self.ui.scaleSlider.value())
         toReturn = newScale/self.currentScale
         self.currentScale = newScale
-        print(str(self.ui.scaleSlider.value())+ " "+ str(toReturn) + " "+ str(self.currentScale) )
+        #print(str(self.ui.scaleSlider.value())+ " "+ str(toReturn) + " "+ str(self.currentScale) )
         return toReturn
 
 

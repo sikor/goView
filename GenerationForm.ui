@@ -6,52 +6,166 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>123</height>
+    <width>420</width>
+    <height>509</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <layout class="QFormLayout" name="formLayout">
-     <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="numberOfPointsLabel">
+     <property name="text">
+      <string>Number of points (axes first)</string>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="numberOfPointsLabel">
-       <property name="text">
-        <string>Number of points</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QSpinBox" name="numberOfPointsSpinBox"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="numberOfSegmentsLabel">
-       <property name="text">
-        <string>Number of segments</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="numberOfSegmentsSpinBox"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="numberOfPolygonsLabel">
-       <property name="text">
-        <string>Number of polygons</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QSpinBox" name="numberOfPolygonsSpinBox"/>
-     </item>
-    </layout>
+    </widget>
    </item>
-   <item>
+   <item row="0" column="1">
+    <widget class="QSpinBox" name="numberOfPointsSpinBox"/>
+   </item>
+   <item row="0" column="2" colspan="2">
+    <widget class="QSpinBox" name="numberOfPointsSpinBox_2"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="numberOfSegmentsLabel">
+     <property name="text">
+      <string>Number of segments</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QSpinBox" name="numberOfSegmentsSpinBox"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="numberOfPolygonsLabel">
+     <property name="text">
+      <string>Number of polygons</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QSpinBox" name="numberOfPolygonsSpinBox"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="shapeOfPointsLabel">
+     <property name="text">
+      <string>Shape Of points</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="2">
+    <widget class="QComboBox" name="shapeCombo">
+     <property name="contextMenuPolicy">
+      <enum>Qt::DefaultContextMenu</enum>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="x1Label">
+     <property name="text">
+      <string>p1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="2">
+    <widget class="QDoubleSpinBox" name="p1x"/>
+   </item>
+   <item row="4" column="3">
+    <widget class="QDoubleSpinBox" name="p1y"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="p2Label">
+     <property name="text">
+      <string>p2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" colspan="2">
+    <widget class="QDoubleSpinBox" name="p2x"/>
+   </item>
+   <item row="5" column="3">
+    <widget class="QDoubleSpinBox" name="p2y"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="p3Label">
+     <property name="text">
+      <string>p3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="2">
+    <widget class="QDoubleSpinBox" name="p3x"/>
+   </item>
+   <item row="6" column="3">
+    <widget class="QDoubleSpinBox" name="p3y"/>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="p4Label">
+     <property name="text">
+      <string>p4</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1" colspan="2">
+    <widget class="QDoubleSpinBox" name="p4x"/>
+   </item>
+   <item row="7" column="3">
+    <widget class="QDoubleSpinBox" name="p4y"/>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="circleCenterLabel">
+     <property name="text">
+      <string>Circle center</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1" colspan="2">
+    <widget class="QDoubleSpinBox" name="circleX"/>
+   </item>
+   <item row="8" column="3">
+    <widget class="QDoubleSpinBox" name="circleY"/>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="xRangeLabel">
+     <property name="text">
+      <string>x range</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1" colspan="2">
+    <widget class="QDoubleSpinBox" name="xRangeMin"/>
+   </item>
+   <item row="9" column="3">
+    <widget class="QDoubleSpinBox" name="xRangeMax"/>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="yRangeLabel">
+     <property name="text">
+      <string>y range</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1" colspan="2">
+    <widget class="QDoubleSpinBox" name="yRangeMin"/>
+   </item>
+   <item row="10" column="3">
+    <widget class="QDoubleSpinBox" name="yRangeMax"/>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="cirleRadiusLabel">
+     <property name="text">
+      <string>Cirle radius</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1" colspan="2">
+    <widget class="QDoubleSpinBox" name="cirleRadius"/>
+   </item>
+   <item row="12" column="0" colspan="3">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
