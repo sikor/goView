@@ -3,18 +3,27 @@ import json
 
 from PyQt4 import QtGui
 from PyQt4 import uic
+from PyQt4 import QtCore
 
 import polygon
 import segment
 import point
 import utils
-import math
 import encoder
 import decoder
 import pointsToJSON
 import segmentsToJSON
-from PyQt4 import QtCore
 
+
+
+class GenerationDialog(QtGui.QDialog):
+    def __init__(self, mainWindow):
+        QtGui.QDialog.__init__(self)
+        self.ui = uic.loadUi('GenerationForm.ui', self)
+        self.mainWindow = mainWindow
+        self.ui.buttonBox.accepted.connect(lambda: self.mainWindow.generateEntities(self.ui.numberOfPointsSpinBox.value(),
+                                                                                self.ui.numberOfSegmentsSpinBox.value(),
+                                                                                self.ui.numberOfPolygonsSpinBox.value()) )
 
 class Scene(QtGui.QGraphicsScene):
     def __init__(self, coords_label):
@@ -42,29 +51,6 @@ class Scene(QtGui.QGraphicsScene):
     def show_coords(self, x, y):
         self.coords_label.setText('x: ' + str(x)[:6] + '\ny: ' + str(y)[:6])
 
-def on_rect():
-    min = -100
-    max = 100
-    return point.Point(random.uniform(min,max),random.uniform(min,max))
-
-def on_circle():
-    r = 10
-
-def on_vector():
-    x = utils.random.uniform(-1000,1000)
-    y = 0.05 * x + 0.05
-    return point.Point(x,y)
-
-def on_circle():
-    a = utils.random.uniform(0, 2 *math.pi)
-    return point.Point(math.sin(a)*100, math.cos(a) * 100)
-
-
-def simple_predicate1(p):
-    return -0.1+p.y-p.x*0.1+p.y
-
-def simple_predicate2(p):
-    return (-1 - p.x)*(0.1-p.y) - (1 - p.x)*(0-p.y)
 
 class GoViewUI(QtGui.QMainWindow):
     def __init__(self):
@@ -79,41 +65,57 @@ class GoViewUI(QtGui.QMainWindow):
         self.ui.loadPointsButton.clicked.connect(lambda: self.on_load_points())
         self.ui.loadSegmentsButton.clicked.connect(lambda: self.on_load_segments())
 
+
         self.scene = Scene(self.ui.coordsLabel)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.scale(1, -1)
+
         self.ui.graphicsView.setRenderHint(QtGui.QPainter.Antialiasing)
 
+        self.currentScale = 1
+        self.ui.scaleSlider.valueChanged.connect(
+            lambda: self.modifyScale()   )
+
+
+        self.generationForm = GenerationDialog(self)
+
+    def modifyScale(self):
+        s = self.getScaleModification()
+        self.ui.graphicsView.scale(s, s)
+
+    def generateEntities(self, pointN, segmentN, polygonN):
+        self.entities += [point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
+                         for unused in range(pointN)]
+        self.entities += [segment.Segment(point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                                          point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)))
+                          for unused in range(segmentN)]
+
+        for i in range(0, polygonN):
+            self.entities.append(polygon.Polygon([
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
+                point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
+            ]))
+
+        self.refresh()
+
+
     def on_generate(self):
-
-
-
-        a = 0; b = 0; c =0
-        for i in range(100000):
-            p = self.entities[i]
-            x = simple_predicate1(p)
-            if x == 0:
-                a+=1
-                p.color= QtGui.QColor(255,0,0)
-            elif x>0:
-                b+=1
-                p.color = QtGui.QColor(0,255,0)
-            else:
-                c+=1
-                p.color = QtGui.QColor(0,0,255)
-
-        print(a,b,c)
-        #self.entities.append(segment.Segment(point.Point(-201,-10),point.Point(199,10)))
-
-
-        #
-
-        #self.refresh()
+        self.generationForm.show()
 
     def on_clear(self):
         print(json.dumps(self.entities, sort_keys=True, indent=4, separators=(',', ': '), default=encoder.default))
         self.entities = []
         self.refresh()
+
+    def getScaleModification(self):
+        newScale = 15.0/(self.ui.scaleSlider.value())
+        toReturn = newScale/self.currentScale
+        self.currentScale = newScale
+        print(str(self.ui.scaleSlider.value())+ " "+ str(toReturn) + " "+ str(self.currentScale) )
+        return toReturn
 
 
     def refresh(self):
@@ -135,7 +137,7 @@ class GoViewUI(QtGui.QMainWindow):
         file = open(file_name)
         try:
             self.entities += json.loads(file.read(), object_hook=decoder.as_entity)
-            #self.refresh()
+            self.refresh()
         except Exception as e:
             print(e)
 
