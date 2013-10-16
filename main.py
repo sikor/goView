@@ -1,9 +1,9 @@
 import sys
 import json
+import math
 
 from PyQt4 import QtGui
 from PyQt4 import uic
-from PyQt4 import QtCore
 
 import polygon
 import segment
@@ -15,15 +15,28 @@ import pointsToJSON
 import segmentsToJSON
 
 
-
 class GenerationDialog(QtGui.QDialog):
+    def on_accept(self):
+        if self.ui.shapeCombo.currentText() == "Circle":
+            self.mainWindow.points_on_circle()
+        elif self.ui.shapeCombo.currentText() == "Points Range":
+            self.mainWindow.points_in_range()
+        else:
+            self.mainWindow.generateEntities(self.ui.numberOfPointsSpinBox.value(),
+                                             self.ui.numberOfSegmentsSpinBox.value(),
+                                             self.ui.numberOfPolygonsSpinBox.value())
+
     def __init__(self, mainWindow):
         QtGui.QDialog.__init__(self)
         self.ui = uic.loadUi('GenerationForm.ui', self)
         self.mainWindow = mainWindow
-        self.ui.buttonBox.accepted.connect(lambda: self.mainWindow.generateEntities(self.ui.numberOfPointsSpinBox.value(),
-                                                                                self.ui.numberOfSegmentsSpinBox.value(),
-                                                                                self.ui.numberOfPolygonsSpinBox.value()) )
+        self.ui.shapeCombo.addItem("Rectangle axis and diagonals")
+        self.ui.shapeCombo.addItem("Circle")
+        self.ui.shapeCombo.addItem("Quadrangle")
+        self.ui.shapeCombo.addItem("Points Range")
+        self.ui.buttonBox.accepted.connect(
+            lambda: self.on_accept())
+
 
 class Scene(QtGui.QGraphicsScene):
     def __init__(self, coords_label):
@@ -65,7 +78,6 @@ class GoViewUI(QtGui.QMainWindow):
         self.ui.loadPointsButton.clicked.connect(lambda: self.on_load_points())
         self.ui.loadSegmentsButton.clicked.connect(lambda: self.on_load_segments())
 
-
         self.scene = Scene(self.ui.coordsLabel)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.scale(1, -1)
@@ -74,8 +86,7 @@ class GoViewUI(QtGui.QMainWindow):
 
         self.currentScale = 1
         self.ui.scaleSlider.valueChanged.connect(
-            lambda: self.modifyScale()   )
-
+            lambda: self.modifyScale())
 
         self.generationForm = GenerationDialog(self)
 
@@ -85,7 +96,7 @@ class GoViewUI(QtGui.QMainWindow):
 
     def generateEntities(self, pointN, segmentN, polygonN):
         self.entities += [point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
-                         for unused in range(pointN)]
+                          for unused in range(pointN)]
         self.entities += [segment.Segment(point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)),
                                           point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400)))
                           for unused in range(segmentN)]
@@ -106,16 +117,33 @@ class GoViewUI(QtGui.QMainWindow):
         self.generationForm.show()
 
     def on_clear(self):
-        print(json.dumps(self.entities, sort_keys=True, indent=4, separators=(',', ': '), default=encoder.default))
         self.entities = []
         self.refresh()
 
     def getScaleModification(self):
-        newScale = 15.0/(self.ui.scaleSlider.value())
-        toReturn = newScale/self.currentScale
+        newScale = 15.0 / (self.ui.scaleSlider.value())
+        toReturn = newScale / self.currentScale
         self.currentScale = newScale
-        print(str(self.ui.scaleSlider.value())+ " "+ str(toReturn) + " "+ str(self.currentScale) )
+        print(str(self.ui.scaleSlider.value()) + " " + str(toReturn) + " " + str(self.currentScale))
         return toReturn
+
+    def points_in_range(self):
+
+        self.entities += [
+            point.Point(
+                utils.random.uniform(self.generationForm.xRangeMin.value(), self.generationForm.xRangeMax.value()),
+                utils.random.uniform(self.generationForm.yRangeMin.value(), self.generationForm.yRangeMax.value()))
+            for unused in range(self.generationForm.numberOfPointsSpinBox.value())]
+        self.refresh()
+
+    def points_on_circle(self):
+
+        gen = lambda angle: point.Point(
+            self.generationForm.circleX.value() + math.sin(angle) * self.generationForm.cirleRadius.value(),
+            self.generationForm.circleX.value() + math.cos(angle) * self.generationForm.cirleRadius.value())
+        self.entities += [gen(utils.random.uniform(-math.pi, +math.pi))
+                          for unused in range(self.generationForm.numberOfPointsSpinBox.value())]
+        self.refresh()
 
 
     def refresh(self):
