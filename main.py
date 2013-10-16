@@ -3,6 +3,7 @@ import json
 
 from PyQt4 import QtGui
 from PyQt4 import uic
+from PyQt4 import QtCore
 
 import polygon
 import segment
@@ -14,6 +15,7 @@ import pointsToJSON
 import segmentsToJSON
 
 
+
 class GenerationDialog(QtGui.QDialog):
     def __init__(self, mainWindow):
         QtGui.QDialog.__init__(self)
@@ -22,7 +24,6 @@ class GenerationDialog(QtGui.QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.mainWindow.generateEntities(self.ui.numberOfPointsSpinBox.value(),
                                                                                 self.ui.numberOfSegmentsSpinBox.value(),
                                                                                 self.ui.numberOfPolygonsSpinBox.value()) )
-        pass
 
 class Scene(QtGui.QGraphicsScene):
     def __init__(self, coords_label):
@@ -64,12 +65,23 @@ class GoViewUI(QtGui.QMainWindow):
         self.ui.loadPointsButton.clicked.connect(lambda: self.on_load_points())
         self.ui.loadSegmentsButton.clicked.connect(lambda: self.on_load_segments())
 
+
         self.scene = Scene(self.ui.coordsLabel)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.scale(1, -1)
+
         self.ui.graphicsView.setRenderHint(QtGui.QPainter.Antialiasing)
 
+        self.currentScale = 1
+        self.ui.scaleSlider.valueChanged.connect(
+            lambda: self.modifyScale()   )
+
+
         self.generationForm = GenerationDialog(self)
+
+    def modifyScale(self):
+        s = self.getScaleModification()
+        self.ui.graphicsView.scale(s, s)
 
     def generateEntities(self, pointN, segmentN, polygonN):
         self.entities += [point.Point(utils.random.uniform(0, 400), utils.random.uniform(0, 400))
@@ -97,6 +109,13 @@ class GoViewUI(QtGui.QMainWindow):
         print(json.dumps(self.entities, sort_keys=True, indent=4, separators=(',', ': '), default=encoder.default))
         self.entities = []
         self.refresh()
+
+    def getScaleModification(self):
+        newScale = 15.0/(self.ui.scaleSlider.value())
+        toReturn = newScale/self.currentScale
+        self.currentScale = newScale
+        print(str(self.ui.scaleSlider.value())+ " "+ str(toReturn) + " "+ str(self.currentScale) )
+        return toReturn
 
 
     def refresh(self):
