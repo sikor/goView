@@ -6,7 +6,7 @@ from entity import Entity
 class Point(Entity):
     default_color = QtGui.QColor(0, 100, 200)
     lightness_threshold = QtGui.QColor(127, 127, 127).lightness()
-    radius = 3
+    radius = 1
 
     def __init__(self, x, y, parents=[]):
         super().__init__(parents)
